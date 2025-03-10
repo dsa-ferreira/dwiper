@@ -5,15 +5,17 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/dsa-ferreira/dwiper/internal/config"
 	"github.com/dsa-ferreira/dwiper/internal/terminal"
 )
 
-var regexes = []string{"^Pokemon.*\\.zip$", "bla", "choo"}
 var selectedRegexes []string
+
+var configuration config.Configuration = config.ParseConfig()
 
 func ImmediateRemoval(fileName string) bool {
 	if selectedRegexes == nil {
-		selectedRegexes = terminal.InteractiveSelection(regexes)
+		selectedRegexes = terminal.InteractiveSelection(configuration.Regexes)
 	}
 
 	for _, r := range selectedRegexes {
@@ -27,7 +29,7 @@ func ImmediateRemoval(fileName string) bool {
 
 func CheckCandidacy(file os.FileInfo) bool {
 	duration := time.Now().Sub(file.ModTime())
-	if duration.Hours() > 24 {
+	if duration.Hours() > configuration.KeepDuration {
 		return true
 	}
 	return false
